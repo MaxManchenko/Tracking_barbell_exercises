@@ -4,7 +4,9 @@ import pandas as pd
 
 from sklearn.metrics import accuracy_score, confusion_matrix
 
-from src.pipelines.classifier_decision_tree.gpt import DataProcessingPipeline
+from src.pipelines.classifier_decision_tree.data_processing_pipeline import (
+    DataProcessingPipeline,
+)
 
 config_path = "config.json"
 

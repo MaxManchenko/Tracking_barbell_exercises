@@ -9,7 +9,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.tree import DecisionTreeClassifier
 
-from LearningAlgorithms import ClassificationAlgorithms
+from src.utils.LearningAlgorithms import ClassificationAlgorithms
 
 # Plot settings
 plt.style.use("fivethirtyeight")
@@ -87,7 +87,7 @@ ax.plot(np.arange(1, max_features + 1, 1), ordered_scores[2], label="Iter 3")
 ax.set_xticks(np.arange(1, max_features + 1, 1))
 ax.set_xlabel("Number of features")
 ax.set_ylabel("Accuracy")
-plt.legend(loc='best')
+plt.legend(loc="best")
 plt.show()
 
 # The plot shows that it makes sense to use a set of 3 features.
@@ -215,7 +215,7 @@ for i, f in zip(range(len(possible_feature_sets)), feature_names):
         }
     )
     score_df = pd.concat([score_df, new_scores])
-``
+
 # --------------------------------------------------------------
 # Create a grouped bar plot to compare the results
 # --------------------------------------------------------------
