@@ -4,7 +4,6 @@ import pandas as pd
 
 from sklearn.metrics import accuracy_score, confusion_matrix
 
-
 config_path = "config.json"
 
 
@@ -26,6 +25,6 @@ y_test = pd.read_pickle(path_to_y_test_data)
 # Perform predictions
 predictions = classifier_dt.predict(X_test)
 
-# Calculate accuracy
+# Calculate accuracy and confusion matrix
 accuracy = accuracy_score(y_test, predictions)
 cm = confusion_matrix(y_test, predictions)

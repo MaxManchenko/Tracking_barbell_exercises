@@ -17,6 +17,7 @@ def make_features(df):
         "gyr_r_freq_0.0_Hz_ws_14",
         "acc_y_freq_0.0_Hz_ws_14",
         "duration",
+        "label",
     ]
 
     df_selected = df[selected_features]

@@ -1,11 +1,11 @@
 import json
 from glob import glob
 
-from src.pipelines.classifier_decision_tree.make_preprocessed_data import (
+from src.pipelines.classifier_decision_tree.MakePreProcessedData import (
     DataPreProcessor,
 )
-from src.pipelines.classifier_decision_tree.make_processed_data import DataProcessor
-from src.pipelines.classifier_decision_tree.make_features import make_features
+from src.pipelines.classifier_decision_tree.MakeProcessedData import DataProcessor
+from src.pipelines.classifier_decision_tree.MakeFeatures import make_features
 
 
 class DataProcessingPipeline:

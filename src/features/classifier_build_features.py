@@ -159,4 +159,4 @@ df_cluster["cluster"] = kmeans.fit_predict(subset)
 # --------------------------------------------------------------
 # Export dataset
 # --------------------------------------------------------------
-df_cluster.to_pickle("../../data/processed/01_data_features.pkl")
+df_cluster.to_pickle(path_to_save_data)

@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import joblib
+import json
 import itertools
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -11,13 +12,24 @@ from sklearn.tree import DecisionTreeClassifier
 
 from src.utils.LearningAlgorithms import ClassificationAlgorithms
 
+config_path = "config.json"
+
+
+# --------------------------------------------------------------
+# Load config. settings and Build the path to the dataset
+# --------------------------------------------------------------
+with open(config_path, "r") as config_file:
+    config = json.load(config_file)
+
+data_path = config["data_path_03_features"]
+
 # Plot settings
 plt.style.use("fivethirtyeight")
 plt.rcParams["figure.figsize"] = (20, 5)
 plt.rcParams["figure.dpi"] = 100
 plt.rcParams["lines.linewidth"] = 2
 
-df = pd.read_pickle("../../data/interim/03_data_features.pkl")
+df = pd.read_pickle(data_path)
 
 # --------------------------------------------------------------
 # Create a training and test set
@@ -230,7 +242,7 @@ plt.legend(loc="lower right")
 plt.show()
 
 # --------------------------------------------------------------
-# Select best model and evaluate results
+# Select the best model and evaluate results
 # --------------------------------------------------------------
 # The RF showed the best result, but DT showed almost the same result on
 # a much smoller set of features, so I choose DT as the main algorithm
@@ -347,9 +359,19 @@ plt.show()
 # plt.show()
 
 # --------------------------------------------------------------
-# Save the best model
+# Train the best model on the whole dataset
 # --------------------------------------------------------------
+data_path_processed = config["data_path_fully_processed_out"]
+df = pd.read_pickle(data_path_processed)
+X = df.drop("label", axis=1)
+y = df["label"]
+
 dtree = DecisionTreeClassifier(min_samples_leaf=min_samples_leaf, criterion=criterion)
 
-model_filename = "../../models/classifier_decision_tree.joblib"
+dtree.fit(X, y)
+
+# --------------------------------------------------------------
+# Save the best model
+# --------------------------------------------------------------
+model_filename = config["model_path_classifier"]
 joblib.dump(dtree, model_filename)
