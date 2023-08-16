@@ -1,5 +1,4 @@
 import json
-import pandas as pd
 
 from src.pipelines.classifier_decision_tree.data_processing_pipeline import (
     DataProcessingPipeline,
@@ -12,8 +11,8 @@ config_path = "config.json"
 with open(config_path, "r") as config_file:
     config = json.load(config_file)
 
-files_path_in = config["data_path_test_raw"]
-data_path_out = config["data_path_X_test_processed"]
+files_path_in = config["files_path_in"]
+data_path_out = config["data_path_fully_processed_out"]
 
 
 # Run data processing pipeline
@@ -26,6 +25,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# Load X test data
-df = pd.read_pickle(data_path_out)

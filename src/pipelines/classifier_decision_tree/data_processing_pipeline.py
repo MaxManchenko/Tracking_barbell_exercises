@@ -11,13 +11,15 @@ from src.pipelines.classifier_decision_tree.make_features import make_features
 class DataProcessingPipeline:
     """
     A class representing a data processing pipeline for preparing raw sensor data
-    for input into a ML model.
+    (stored in separate files) for input into a ML model: "files in -> data out".
 
     This pipeline includes data loading, preprocessing, feature extraction, and
     data saving steps.
 
     Args:
         config_path (str): The path to the configuration file containing pipeline settings.
+        files_path_in (str): Path to the folder with files.
+        data_path_out (str): Path to the folder for storing processed data.
 
     Methods:
         load_config():
@@ -34,8 +36,10 @@ class DataProcessingPipeline:
             Save the processed data to a specified location.
     """
 
-    def __init__(self, config_path):
+    def __init__(self, config_path, files_path_in, data_path_out):
         self.config_path = config_path
+        self.files_path_in = files_path_in
+        self.data_path_out = data_path_out
         self.load_config()
 
     def load_config(self):
@@ -51,9 +55,8 @@ class DataProcessingPipeline:
 
     def load_data(self):
         # Load config. settings and Build the path to the .csv files
-        files_path = self.config["files_path"]
         file_pattern = self.config["file_pattern"]
-        full_path_pattern = files_path + "*" + file_pattern
+        full_path_pattern = self.files_path_in + "*" + file_pattern
         self.files = glob(full_path_pattern)
 
     def preprocess_data(self):
@@ -99,8 +102,7 @@ class DataProcessingPipeline:
 
     # Save the fully processed data
     def save_processed_data(self):
-        path_to_save_processed_data = self.config["data_path_fully_processed"]
-        self.df_selected.to_pickle(path_to_save_processed_data)
+        self.df_selected.to_pickle(self.data_path_out)
 
 
 if __name__ == "__main__":

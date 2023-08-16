@@ -1,13 +1,14 @@
 {
     "model_path_classifier": "models/classifier_decision_tree.joblib",
     "model_path_counter": "models/counter.joblib",
-    "data_path_X_test": "data/test/X_test.csv",
-    "data_path_y_test": "data/test/y_test.csv",
+    "data_path_test_raw": "data/test/raw/",
+    "data_path_X_test_processed": "data/test/processed/X_test/processed_data.pkl",
+    "data_path_y_test_processed": "data/test/processed/y_test/",
     "data_path_input_to_classifier": "data/processed/processed_data.pkl",
-    "data_path_fully_processed": "data/processed/01_processed_data.pkl",
+    "data_path_fully_processed_out": "data/processed/01_processed_data.pkl",
     "data_path_01_dataset": "data/interim/01_dataset.pkl",
     "data_path_02_outliers_removed": "data/interim/02_outliers_removed_by_IQR.pkl",
     "data_path_03_features": "data/interim/data_path_03_features.pkl",
-    "files_path": "data/raw/MetaMotion/",
+    "files_path_in": "data/raw/MetaMotion/",
     "file_pattern": ".csv"
 }
