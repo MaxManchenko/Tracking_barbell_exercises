@@ -18,6 +18,7 @@ class DataProcessingPipeline:
 
     Args:
         data_config_path (str): Path to the JSON data configuration file.
+        test (bool, default=False): Indicates whether data processing is intended to generate test data.
 
     Methods:
         load_config():
