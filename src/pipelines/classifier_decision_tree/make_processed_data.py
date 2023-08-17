@@ -4,7 +4,7 @@ from src.pipelines.classifier_decision_tree.DataProcessingPipeline import (
     DataProcessingPipeline,
 )
 
-config_path = "config.json"
+config_path = "configs/data_config_classifier.json"
 
 
 # Load configuration settings and build the path to the files

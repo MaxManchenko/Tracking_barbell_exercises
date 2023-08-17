@@ -36,8 +36,8 @@ class DataProcessingPipeline:
             Save the processed data to a specified location.
     """
 
-    def __init__(self, config_path, files_path_in, data_path_out):
-        self.config_path = config_path
+    def __init__(self, data_config_path, files_path_in, data_path_out):
+        self.config_path = data_config_path
         self.files_path_in = files_path_in
         self.data_path_out = data_path_out
         self.load_config()
@@ -106,6 +106,6 @@ class DataProcessingPipeline:
 
 
 if __name__ == "__main__":
-    config_path = "config.json"
+    config_path = "configs/data_config_classifier.json"
     pipeline = DataProcessingPipeline(config_path)
     pipeline.run()

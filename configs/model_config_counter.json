@@ -1,0 +1,12 @@
+{
+    "column": "acc_r",
+    "column_row": "gyr_x",
+    "fs": 5.0,
+    "order": 10,
+    "cutoff_dict": {
+        "default": 0.4,
+        "squat": 0.35,
+        "row": 0.65,
+        "ohp": 0.35
+    }
+}

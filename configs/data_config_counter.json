@@ -1,0 +1,10 @@
+{
+    "model_path_classifier": "models/classifier_decision_tree.joblib",
+    "model_path_counter": "models/counter.joblib",
+    "data_path_test_raw": "data/test/raw/",
+    "data_path_X_y_test": "data/test/processed/X_y.pkl",
+    "data_path_X_test": "data/test/processed/X_test.pkl",
+    "data_path_y_test": "data/test/processed/y_test.pkl",
+    "data_path_in": "data/interim/01_dataset.pkl",
+    "data_path_out": "data/processed/dataset_counter.pkl"
+}

@@ -107,9 +107,6 @@ class DataProcessor:
     def square_attributes(self, df):
         """Build the sum of squares of the acceleration and gyroscope components
         along the x, y, z axises that are invariant to device orientation
-
-        Args:
-            df (pd.DataFrame): _description_
         """
 
         df_squared = df.copy()

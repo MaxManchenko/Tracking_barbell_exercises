@@ -1,14 +1,29 @@
+import json
 import numpy as np
 import pandas as pd
-from DataTransformation import LowPassFilter
 from scipy.signal import argrelextrema
 
+from src.utils.DataTransformation import LowPassFilter
+
 pd.options.mode.chained_assignment = None
+
+config_path = "config.json"
+
+
+# --------------------------------------------------------------
+# Load configuration settings and build the path to the files
+# --------------------------------------------------------------
+with open(config_path, "r") as config_file:
+    config = json.load(config_file)
+
+dataset_path = config["data_path_01_dataset"]
+# path_to_save_data = config["data_path_03_features"]
+
 
 # --------------------------------------------------------------
 # Load data
 # --------------------------------------------------------------
-df = pd.read_pickle("../../data/interim/01_data_precessed.pkl")
+df = pd.read_pickle(dataset_path)
 df = df.query('label!="rest"')
 
 acc_r = df["acc_x"].pow(2) + df["acc_y"].pow(2) + df["acc_z"].pow(2)
