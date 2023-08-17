@@ -17,9 +17,7 @@ class DataProcessingPipeline:
     data saving steps.
 
     Args:
-        config_path (str): The path to the configuration file containing pipeline settings.
-        files_path_in (str): Path to the folder with files.
-        data_path_out (str): Path to the folder for storing processed data.
+        data_config_path (str): Path to the JSON data configuration file.
 
     Methods:
         load_config():
@@ -36,17 +34,50 @@ class DataProcessingPipeline:
             Save the processed data to a specified location.
     """
 
-    def __init__(self, data_config_path, files_path_in, data_path_out):
-        self.config_path = data_config_path
-        self.files_path_in = files_path_in
-        self.data_path_out = data_path_out
+    def __init__(self, data_config_path, test=False):
+        """
+        Initialize the DataProcessingPipeline instance.
+
+        Args:
+            data_config_path (str): Path to the JSON data configuration file.
+        """
+        self.data_config = data_config_path
+        self.test = test
         self.load_config()
 
     def load_config(self):
-        with open(self.config_path, "r") as config_file:
-            self.config = json.load(config_file)
+        """
+        Load data configuration settings from the JSON file.
+        """
+        if self.test:
+            try:
+                with open(self.data_config, "r") as data_config_file:
+                    self.data_config = json.load(data_config_file)
+                    self.files_path_in = self.data_config["data_paths"].get("test_raw")
+                    self.data_path_out = self.data_config["data_paths"].get("X_y_test")
+                    self.file_pattern = self.data_config.get("file_pattern", "csv")
+            except FileExistsError:
+                print("Data config file not found.")
+                self.files_path_in = None
+                self.data_path_out = None
+        else:
+            try:
+                with open(self.data_config, "r") as data_config_file:
+                    self.data_config = json.load(data_config_file)
+                    self.files_path_in = self.data_config.get("files_path_in")
+                    self.data_path_out = self.data_config["data_paths"].get(
+                        "fully_processed_out"
+                    )
+                    self.file_pattern = self.data_config.get("file_pattern", "csv")
+            except FileExistsError:
+                print("Data config file not found.")
+                self.files_path_in = None
+                self.data_path_out = None
 
     def run(self):
+        """
+        Execute the data processing pipeline.
+        """
         self.load_data()
         self.preprocess_data()
         self.process_data()
@@ -54,13 +85,16 @@ class DataProcessingPipeline:
         self.save_processed_data()
 
     def load_data(self):
-        # Load config. settings and Build the path to the .csv files
-        file_pattern = self.config["file_pattern"]
-        full_path_pattern = self.files_path_in + "*" + file_pattern
+        """
+        Load the input dataset.
+        """
+        full_path_pattern = self.files_path_in + "*" + self.file_pattern
         self.files = glob(full_path_pattern)
 
     def preprocess_data(self):
-        # Call DataPreProcessor
+        """
+        Perform data preprocessing.
+        """
         data_preprocessor = DataPreProcessor()
         # Read data
         self.acc_df, self.gyr_df = data_preprocessor.read_data_from_files(self.files)
@@ -70,7 +104,9 @@ class DataProcessingPipeline:
         self.data_resampled = data_preprocessor.resample_data(self.data_merged)
 
     def process_data(self):
-        # Call DataProcessor
+        """
+        Perform data processing.
+        """
         data_processor = DataProcessor()
         # Mark outliers
         self.data_w_marked_outliers = data_processor.remove_outliers_by_IQR(
@@ -96,16 +132,19 @@ class DataProcessingPipeline:
         # Make Fourier transformation
         self.data_freq = data_processor.fourier_transform(self.data_temporal)
 
-    # Build the final dataset with selected features
     def extract_features(self):
+        """
+        Build the final dataset with selected features.
+        """
         self.df_selected = make_features(self.data_freq)
 
-    # Save the fully processed data
     def save_processed_data(self):
+        """
+        Save the processed data to an output file.
+        """
         self.df_selected.to_pickle(self.data_path_out)
 
 
 if __name__ == "__main__":
-    config_path = "configs/data_config_classifier.json"
-    pipeline = DataProcessingPipeline(config_path)
+    pipeline = DataProcessingPipeline()
     pipeline.run()

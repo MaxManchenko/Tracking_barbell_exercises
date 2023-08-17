@@ -82,6 +82,5 @@ class DataProcessingPipelineCounter:
 
 
 if __name__ == "__main__":
-    data_config_path = "configs/data_config_counter.json"
-    pipeline = DataProcessingPipelineCounter(data_config_path)
+    pipeline = DataProcessingPipelineCounter()
     pipeline.run()

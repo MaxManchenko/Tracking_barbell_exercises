@@ -5,26 +5,22 @@ from src.pipelines.classifier_decision_tree.DataProcessingPipeline import (
     DataProcessingPipeline,
 )
 
-config_path = "config.json"
+data_config_path = "configs/data_config_classifier.json"
 
 
 # Load configuration settings and build the path to the files
-with open(config_path, "r") as config_file:
-    config = json.load(config_file)
+with open(data_config_path, "r") as data_config_file:
+    data_config = json.load(data_config_file)
 
-files_path_in = config["data_path_test_raw"]
-data_path_out = config["data_path_X_y_test"]
+data_path_out = data_config["data_paths"].get("X_y_test")
 
-data_path_X_y_test = config["data_path_X_y_test"]
-data_path_X_test = config["data_path_X_test"]
-data_path_y_test = config["data_path_y_test"]
+data_path_X_test = data_config["data_paths"].get("X_test")
+data_path_y_test = data_config["data_paths"].get("y_test")
 
 
 # Run data processing pipeline
 def main():
-    pipeline = DataProcessingPipeline(
-        config_path, files_path_in=files_path_in, data_path_out=data_path_out
-    )
+    pipeline = DataProcessingPipeline(data_config_path, test=True)
     pipeline.run()
 
 
