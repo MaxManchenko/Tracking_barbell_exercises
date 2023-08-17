@@ -28,75 +28,45 @@ if __name__ == "__main__":
     main()
 
 
-# class CountRepetitions:
-#     def __init__(self, data_config_path, model_config_path):
-#         self.data_config = data_config_path
-#         self.model_config = model_config_path
-#         self.load_data_config()
-#         self.load_model_config()
-
-#     def load_data_config(self):
-#         with open(self.data_config_path, "r") as data_config_file:
-#             self.data_config = json.load(data_config_file)
-#             self.data_path_in = self.data_config["data_path_out"]
-
-#     def load_model_config(self):
-#         with open(self.model_config_path, "r") as model_config_file:
-#             self.model_config = json.load(model_config_file)
-#             self.column = self.model_config["column"]
-#             self.column_row = self.model_config["column_row"]
-#             self.cutoff = self.model_config["cutoff"]
-#             self.cutoff_squat = self.model_config["cutoff_squat"]
-#             self.cutoff_row = self.model_config["cutoff_row"]
-#             self.cutoff_ohp = self.model_config["cutoff_ohp"]
-#             self.fs = self.model_config["fs"]
-#             self.order = self.model_config["order"]
-
-#     def load_data(self):
-#         self.df = pd.read_pickle(self.data_path_in)
-
-#     def process_data(self):
-#         LowPass = LowPassFilter()
-#         for s in self.df["set"].unique():
-#             self.subset = self.df[self.df["set"] == s]
-
-#             if self.subset["label"].iloc[0] == "suqat":
-#                 self.cutoff = 0.35
-
-#             elif self.subset["label"].iloc[0] == "row":
-#                 self.cutoff = 0.65
-#                 self.column = "gyr_x"
-
-#             elif self.subset["label"].iloc[0] == "ohp":
-#                 self.cutoff = 0.35
-
-#             self.data_lowpass = LowPass.low_pass_filter(
-#                 self.df,
-#                 col=self.column,
-#                 sampling_frequency=self.fs,
-#                 cutoff_frequency=self.cutoff,
-#                 order=self.order,
-#             )
-
-#     def count_reps(self):
-#         indixes = argrelextrema(
-#             self.data_lowpass[self.column + "_lowpass"].values, np.greater
-#         )
-#         peaks = self.data_lowpass.iloc[indixes]
-
-#         result = len(peaks)
-
-#         return result
-
-
+# --------------------------------------------------------------
+# Make class to count repetitions
+# --------------------------------------------------------------
 class CountRepetitions:
+    """
+    A class for counting repetitions in each set.
+
+    This class provides methods to load sensor data, process the data to identify
+    repetitions, and perform counting for different types of exercises.
+
+    Attributes:
+        data_config_path (str): Path to the data configuration JSON file.
+
+    Methods:
+        load_data_config(): Load data configuration from JSON file.
+        load_data(): Load sensor data from a pickle file.
+        process_data(): Process sensor data to prepare for repetition counting.
+        count_reps_one_set(subset: pd.DataFrame): Count repetitions for a specific exercise set.
+        count_reps(): Count repetitions for all exercise sets.
+    """
+
     def __init__(self, data_config_path, model_config_path):
+        """
+        Initialize the CountRepetitions instance.
+
+        Args:
+            data_config_path (str): Path to the data configuration JSON file.
+        """
         self.data_config_path = data_config_path
         self.model_config_path = model_config_path
         self.load_data_config()
         self.load_model_config()
+        self.load_data()
+        self.process_data()
 
     def load_data_config(self):
+        """
+        Load data configuration from JSON file.
+        """
         try:
             with open(self.data_config_path, "r") as data_config_file:
                 self.data_config = json.load(data_config_file)
@@ -106,6 +76,9 @@ class CountRepetitions:
             self.data_path_in = None
 
     def load_model_config(self):
+        """
+        Load model configuration from JSON file.
+        """
         try:
             with open(self.model_config_path, "r") as model_config_file:
                 self.model_config = json.load(model_config_file)
@@ -123,6 +96,9 @@ class CountRepetitions:
             self.cutoff_dict = {}
 
     def load_data(self):
+        """
+        Load data from a pickle file.
+        """
         try:
             self.df = pd.read_pickle(self.data_path_in)
         except FileNotFoundError:
@@ -130,13 +106,16 @@ class CountRepetitions:
             self.df = None
 
     def process_data(self):
+        """
+        Process data to prepare for repetition counting.
+        """
         LowPass = LowPassFilter()
 
         label = self.df["label"].iloc[0]
         self.cutoff = self.cutoff_dict.get(label, self.cutoff_dict.get("default", 0.4))
         self.column = self.column_row if label == "row" else self.column
 
-        self.data_lowpass = LowPass.low_pass_filter(
+        self.df_lowpass = LowPass.low_pass_filter(
             self.df,
             col=self.column,
             sampling_frequency=self.fs,
@@ -144,21 +123,44 @@ class CountRepetitions:
             order=self.order,
         )
 
+    def count_reps_one_set(self, subset):
+        """
+        Count repetitions for a specific exercise set.
+
+        Args:
+            subset (pd.DataFrame): Subset of data for a specific exercise set.
+
+        Returns:
+            int: Count of repetitions.
+        """
+        indixes = argrelextrema(subset[self.column + "_lowpass"].values, np.greater)
+        peaks = subset.iloc[indixes]
+        counts = len(peaks)
+        return int(counts)
+
     def count_reps(self):
-        indixes = argrelextrema(
-            self.data_lowpass[self.column + "_lowpass"].values, np.greater
+        """
+        Count repetitions for all exercise sets.
+
+        Returns:
+            pd.DataFrame: DataFrame with repetitions counted for each exercise set.
+        """
+        self.df_lowpass["reps_pred"] = 0
+        for s in self.df_lowpass["set"].unique():
+            subset = self.df_lowpass.query("set == @s")
+            reps = self.count_reps_one_set(subset)
+            self.df_lowpass.loc[self.df["set"] == s, "reps_pred"] = reps
+
+        rep_df = (
+            self.df_lowpass.groupby(["label", "category", "set"])["reps_pred"]
+            .max()
+            .reset_index()
         )
-        peaks = self.data_lowpass.iloc[indixes]
-
-        result = len(peaks)
-
-        return result
+        return rep_df
 
 
-# Example usage
-
+# --------------------------------------------------------------
+# Verification
+# --------------------------------------------------------------
 counter = CountRepetitions(data_config_path, model_config_path)
-counter.load_data()
-counter.process_data()
 repetition_count = counter.count_reps()
-print("Repetition count:", repetition_count)

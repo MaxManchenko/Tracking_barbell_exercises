@@ -4,7 +4,7 @@ import pandas as pd
 
 from sklearn.metrics import accuracy_score, confusion_matrix
 
-config_path = "config.json"
+config_path = "configs/data_config_classifier.json"
 
 
 # Load config. settings and Build the path to the files
